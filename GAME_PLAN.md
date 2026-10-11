@@ -12,16 +12,16 @@ The tone is warm and lightly humorous, with occasional mystery and danger. The w
 
 ## Visual style and presentation
 
-- Cozy, cartoonish 2D art with warm colors, soft shapes, and expressive guest reactions.
-- The customer is the character on screen; the player is never represented by a bartender, hands, or a first-person avatar.
-- During service, frame the guest and their order so the player can read their mood and response.
-- During preparation, cut to a close-up of the work surface, vessel, and ingredients. Show actions directly through animated objects: a knife slices a lemon, ale pours into a mug, or selected potion ingredients drop in and swirl together.
-- Keep touch targets large and the important ingredients and action feedback clear on a phone.
+- Cozy, cartoonish 2D art with a soft painterly finish, candlelit amber colors, and expressive guest reactions.
+- Use a landscape tavern-counter composition: the guest sits centrally behind the bar, their order appears above and to the right, preparation stations fill the foreground, and ingredient choices sit along the bottom.
+- The customer is the visible character; the player is never represented by a bartender, hands, or a first-person avatar.
+- Keep the tavern view during preparation. Show actions through animated objects in the foreground stations: a knife cuts ingredients, potion bubbles stir in the cauldron, and steam rises from a finished dish.
+- Keep touch targets large and order feedback clear on a phone held sideways.
 
 ## Target and format
 
 - **Platform:** iOS and Android phones; tablets can be supported later.
-- **View:** 2D, portrait orientation, designed for one-handed touch play.
+- **View:** 2D, landscape orientation, designed for touch play with a wide tavern counter scene.
 - **Session length:** A shift should take about 3–7 minutes; a full in-game day about 8–15 minutes.
 - **Mode:** Single-player. The first version should work offline and avoid accounts, ads, and online services.
 - **Prototype technology:** A standalone HTML/CSS/JavaScript browser prototype for easy sharing and phone testing; it does not require an engine install.
@@ -90,14 +90,14 @@ Guests bring small, self-contained stories: a courier with a sealed parcel, a he
 ### Phase 0 — Decisions and foundations
 
 - [ ] Confirm the target devices and minimum OS versions.
-- [ ] Choose the engine and establish a mobile project, portrait layout, and version control conventions.
+- [ ] Choose the production engine and establish a mobile project, landscape layout, and version control conventions.
 - [ ] Decide the intended release model and whether the first milestone is a prototype, vertical slice, or production build.
 - [ ] Write a one-page visual reference sheet for the original setting and character style.
 - [ ] Define the first-shift scope and success criteria before adding content.
 
 ### Phase 1 — Playable serving prototype
 
-- [ ] Build the main tavern screen with safe-area-aware portrait UI.
+- [ ] Build the main tavern screen with safe-area-aware landscape UI.
 - [ ] Implement guest arrival, order display, patience, and departure.
 - [ ] Implement recipe data and the prepare/serve interaction.
 - [ ] Build the preparation view around animated ingredients, vessels, and tools; keep the player character off-screen.
@@ -126,10 +126,10 @@ Guests bring small, self-contained stories: a courier with a sealed parcel, a he
 
 ## Assets to provide or commission
 
-You do **not** need to download anything to start. We can build the first prototype with simple placeholder art and audio.
+The first prototype now uses the supplied tavern background, guest portrait, and ingredient/order icons in `assets/`. New art is not required for this prototype.
 
 - **Music:** Your royalty-free fantasy music source is useful. Before using a track, check its license for mobile games, commercial use (if applicable), attribution, modification, and distribution in an app. Keep the license text and source details with the project.
-- **Art:** No images are required yet. Later, the game will need an original tavern background, guest portraits, UI icons, and a small set of animated effects. These can be commissioned, generated, or drawn; avoid assets that imitate recognizable franchise characters or designs.
+- **Art:** The prototype uses the supplied background, elven guest portrait, and PNG icons. Later, the game will need more original guest portraits, ingredient and dish icons, and a small set of animated effects. Keep the source/license details for any assets used in a release.
 - **Sound effects:** Optional at prototype stage; later we may want pouring, serving, footsteps/door, fire, and interface sounds. Ensure each has a license suitable for the intended release.
 
 ## Reference research: *Bartender: The Right Mix*
@@ -147,4 +147,4 @@ Sources consulted: [CrazyGames game page](https://www.crazygames.com/game/barten
 
 ## Prototype status
 
-The first playable prototype is implemented in `index.html`, `style.css`, and `game.js`. It covers three guests in one shift, ingredient selection, preparation actions, serving, guest reactions, coin/goodwill rewards, and a shift summary. It uses CSS illustrations and emoji placeholders so it can be shared without downloading assets. See `README.md` for how to play it.
+The browser prototype is implemented in `index.html`, `style.css`, and `game.js`. It uses the supplied landscape tavern background, customer portrait, and ingredient icons. The loop covers ingredient selection, preparation, serving, a guest reaction, coin rewards, and three sample orders. See `README.md` for how to play it.
