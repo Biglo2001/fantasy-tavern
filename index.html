@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#253b35">
+  <title>The Lantern &amp; Ladle — Prototype</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="The Lantern and Ladle home">
+        <span class="brand-lantern" aria-hidden="true">✦</span>
+        <span><strong>The Lantern <i>&amp;</i> Ladle</strong><small>A roadside tavern</small></span>
+      </a>
+      <div class="shift-chip"><span class="live-dot"></span><span id="shift-label">FIRST SHIFT</span></div>
+      <button class="sound-button" id="sound-toggle" aria-label="Toggle sound" title="Toggle sound">♫</button>
+    </header>
+
+    <section class="game-card" aria-live="polite">
+      <div class="hud">
+        <div class="hud-stat"><span class="hud-icon coin-icon">✦</span><span><small>COIN</small><strong id="coin-count">12</strong></span></div>
+        <div class="shift-progress"><span class="progress-copy" id="progress-copy">GUEST 1 OF 3</span><div class="progress-track"><span id="progress-fill"></span></div></div>
+        <div class="hud-stat reputation-stat"><span class="hud-icon rep-icon">♥</span><span><small>GOODWILL</small><strong id="rep-count">0</strong></span></div>
+      </div>
+
+      <section class="tavern-scene" id="scene">
+        <div class="scene-lights" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="scene-sign"><span class="sign-flame">✦</span><span>THE LANTERN &amp; LADLE</span><span class="sign-leaf">❧</span></div>
+        <div class="window-glow" aria-hidden="true"><span>☾</span><i></i><i></i></div>
+        <div class="shelf" aria-hidden="true"><span>⚱</span><span>◉</span><span>⚱</span><span>◉</span></div>
+        <div class="scene-floor" aria-hidden="true"></div>
+
+        <div class="guest-area">
+          <div class="guest-portrait" id="guest-portrait" aria-label="Guest portrait">
+            <div class="guest-hair" id="guest-hair"></div>
+            <div class="guest-face"><span class="guest-brow"></span><span class="guest-eyes">• •</span><span class="guest-cheeks">·</span><span class="guest-mouth" id="guest-mouth">⌣</span></div>
+            <div class="guest-ears"><i></i><i></i></div>
+            <div class="guest-body" id="guest-body"></div>
+            <div class="guest-collar"></div>
+          </div>
+          <div class="guest-nameplate"><span class="guest-mood-dot" id="mood-dot"></span><span id="guest-name">Mira Fernwhistle</span></div>
+          <div class="guest-caption" id="guest-caption">“A little sparkle, if you please!”</div>
+          <div class="speech-bubble" id="reaction-bubble" hidden></div>
+        </div>
+
+        <aside class="order-card" id="order-card">
+          <div class="order-top"><span class="order-kicker">A guest asks for</span><span class="order-stamp" id="order-stamp">DRINK</span></div>
+          <div class="order-name" id="order-name">Bramble Fizz</div>
+          <div class="order-description" id="order-description">Bright, bubbly &amp; a little sweet</div>
+          <div class="order-recipe" id="order-recipe"></div>
+          <div class="patience-row"><span>Patience</span><div class="patience-track"><span id="patience-fill"></span></div></div>
+        </aside>
+
+        <div class="bar-counter" aria-hidden="true"></div>
+      </section>
+
+      <section class="prep-panel" id="prep-panel">
+        <div class="prep-heading">
+          <div><span class="eyebrow" id="prep-eyebrow">YOUR COUNTER</span><h1 id="prep-title">Make the Bramble Fizz</h1></div>
+          <span class="step-pill" id="step-pill">STEP 1 / 3</span>
+        </div>
+
+        <div class="mixing-board" id="mixing-board">
+          <div class="tool-station" id="tool-station">
+            <div class="vessel-shadow"></div>
+            <div class="vessel" id="vessel"><div class="liquid" id="liquid"></div><div class="vessel-rim"></div><span class="vessel-emoji" id="vessel-emoji">🍺</span></div>
+            <div class="tool-label" id="tool-label">YOUR MUG</div>
+          </div>
+          <div class="mix-side">
+            <div class="mix-status" id="mix-status"><span class="status-icon">✧</span><span>Choose ingredients to begin</span></div>
+            <div class="added-ingredients" id="added-ingredients" aria-label="Ingredients added"></div>
+            <div class="step-instruction" id="step-instruction">Tap the ingredients your guest asked for.</div>
+          </div>
+        </div>
+
+        <div class="ingredient-section">
+          <div class="ingredient-heading"><span id="ingredient-label">PICK YOUR INGREDIENTS</span><span class="ingredient-count" id="ingredient-count">0 added</span></div>
+          <div class="ingredient-grid" id="ingredient-grid"></div>
+        </div>
+
+        <div class="action-row">
+          <button class="secondary-button" id="clear-button" type="button">Start over</button>
+          <button class="primary-button" id="action-button" type="button"><span id="action-icon">✧</span><span id="action-label">Mix the drink</span><span class="button-arrow">→</span></button>
+        </div>
+        <p class="micro-hint" id="micro-hint">No hands in sight. Just good ingredients and a little tavern magic.</p>
+      </section>
+    </section>
+
+    <footer class="footer-note"><span>☼</span> A tiny tavern, a thousand stories <span>☼</span></footer>
+  </main>
+
+  <div class="modal-backdrop" id="modal-backdrop">
+    <section class="welcome-modal" id="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+      <div class="modal-sparkle">✦</div>
+      <p class="eyebrow">A LITTLE SHIFT AT THE EDGE OF THE MARCH</p>
+      <h2 id="welcome-title">The doors are open.</h2>
+      <p class="welcome-copy">Three travelers are stopping by tonight. Make what they ask for, add a pinch of magic, and see who comes back tomorrow.</p>
+      <div class="welcome-facts"><span>✦ &nbsp;Pick ingredients</span><span>✦ &nbsp;Make it your way</span><span>✦ &nbsp;Watch their reaction</span></div>
+      <button class="primary-button welcome-button" id="start-button" type="button"><span>Open for the evening</span><span class="button-arrow">→</span></button>
+      <small>PROTOTYPE · FIRST SHIFT</small>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="game.js"></script>
+</body>
+</html>
