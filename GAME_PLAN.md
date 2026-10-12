@@ -128,9 +128,9 @@ Guests bring small, self-contained stories: a courier with a sealed parcel, a he
 
 The first prototype now uses the supplied tavern background, guest portrait, and ingredient/order icons in `assets/`. New art is not required for this prototype.
 
-- **Music:** Your royalty-free fantasy music source is useful. Before using a track, check its license for mobile games, commercial use (if applicable), attribution, modification, and distribution in an app. Keep the license text and source details with the project.
+- **Music:** `assets/music/Ale and Anecdotes.mp3` now plays as a quiet loop after the first interaction. Keep its source/license details with the project and verify attribution and distribution terms before release.
+- **Sound effects:** Supplied clips in `assets/sounds/` are connected to ingredient selection, preparation, serving, coin rewards, and new orders. Some are intentionally clipped to short opening segments for the prototype.
 - **Art:** The prototype uses the supplied background, elven guest portrait, and PNG icons. Later, the game will need more original guest portraits, ingredient and dish icons, and a small set of animated effects. Keep the source/license details for any assets used in a release.
-- **Sound effects:** Optional at prototype stage; later we may want pouring, serving, footsteps/door, fire, and interface sounds. Ensure each has a license suitable for the intended release.
 
 ## Reference research: *Bartender: The Right Mix*
 
@@ -147,4 +147,4 @@ Sources consulted: [CrazyGames game page](https://www.crazygames.com/game/barten
 
 ## Prototype status
 
-The browser prototype is implemented in `index.html`, `style.css`, and `game.js`. It uses the supplied landscape tavern background, customer portrait, and ingredient icons. The loop covers ingredient selection, preparation, serving, a guest reaction, coin rewards, and three sample orders. See `README.md` for how to play it.
+The browser prototype is implemented in `index.html`, `style.css`, and `game.js`. It uses the supplied landscape tavern background, customer portrait, ingredient icons, music, and sound effects. The loop covers ingredient selection, preparation, serving, a guest reaction, coin rewards, and three sample orders. See `README.md` for how to play it.

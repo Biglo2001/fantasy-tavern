@@ -29,7 +29,54 @@ const orders = [
 ];
 
 const $ = (id) => document.getElementById(id);
-const state = { orderIndex: 0, selected: [], phase: "choose", coins: 23, day: 3, served: 0, timer: null, feedbackTimer: null };
+const state = { orderIndex: 0, selected: [], phase: "choose", coins: 23, day: 3, served: 0, timer: null, feedbackTimer: null, muted: false, musicStarted: false };
+const audioBase = new URL("assets/sounds/", document.baseURI);
+const music = new Audio(new URL("assets/music/Ale and Anecdotes.mp3", document.baseURI));
+music.loop = true;
+music.volume = 0.24;
+music.preload = "auto";
+const soundFiles = {
+  plate: "freesound_community-ceramic-plate-set-down-71330.mp3",
+  pour: "freesound_community-quick-pour-86306.mp3",
+  chair: "freesound_community-wooden-chair-push-in-pull-outwav-14414.mp3",
+  cut: "jarasnat-cut-vegetables-and-fruits-version-2-312125.mp3",
+  chop: "freesound_community-cutting-board-chops-scrapes-61998.mp3",
+  stir: "freesound_community-stirring-bowl-63259.mp3",
+  coin: "universfield-spinning-coin-on-table-352448.mp3",
+  menu: "freesound_community-menu-selection-102220.mp3"
+};
+const activeEffects = new Set();
+
+function startMusic() {
+  if (state.muted || state.musicStarted) return;
+  state.musicStarted = true;
+  music.play().catch(() => { state.musicStarted = false; });
+}
+
+function playSound(key, clipSeconds = null, delayMs = 0) {
+  if (state.muted) return;
+  const play = () => {
+    if (state.muted) return;
+    const sound = new Audio(new URL(soundFiles[key], audioBase));
+    sound.preload = "auto";
+    sound.volume = 0.62;
+    const stopClip = () => {
+      if (clipSeconds !== null && !sound.paused) {
+        sound.pause();
+        sound.currentTime = 0;
+      }
+      activeEffects.delete(sound);
+    };
+    let stopTimer;
+    sound.addEventListener("ended", () => { clearTimeout(stopTimer); activeEffects.delete(sound); }, { once: true });
+    activeEffects.add(sound);
+    sound.play().then(() => {
+      if (clipSeconds !== null) stopTimer = setTimeout(stopClip, clipSeconds * 1000);
+    }).catch(() => activeEffects.delete(sound));
+  };
+  if (delayMs > 0) setTimeout(play, delayMs);
+  else play();
+}
 
 function currentOrder() { return orders[state.orderIndex]; }
 
@@ -78,9 +125,17 @@ function renderIngredients() {
 
 function toggleIngredient(id) {
   if (state.phase !== "choose") return;
+  startMusic();
   const index = state.selected.indexOf(id);
-  if (index >= 0) state.selected.splice(index, 1);
-  else if (state.selected.length < currentOrder().needs.length) state.selected.push(id);
+  if (index >= 0) {
+    state.selected.splice(index, 1);
+    playSound("menu");
+  } else if (state.selected.length < currentOrder().needs.length) {
+    state.selected.push(id);
+    const soundForIngredient = { potion: "pour", lemon: "cut", herbs: "chop", mushroom: "cut", meat: "cut" };
+    const clipLengths = { herbs: 7, lemon: 3, mushroom: 3, meat: 3 };
+    playSound(soundForIngredient[id], clipLengths[id] ?? null);
+  }
   renderIngredients();
   updateAction();
   if (state.selected.length === currentOrder().needs.length) setFeedback("Lovely. Ready to prepare!");
@@ -117,6 +172,9 @@ function handleMainAction() {
 
 function prepareOrder() {
   if (state.selected.length !== currentOrder().needs.length) return;
+  startMusic();
+  if (currentOrder().outputs.includes("stew_icon_0.png")) playSound("stir", 3);
+  else playSound("menu");
   state.phase = "preparing";
   $("game-stage").classList.add("is-preparing");
   setFeedback("A little chopping, stirring, and tavern magic…");
@@ -133,6 +191,10 @@ function prepareOrder() {
 
 function serveOrder() {
   const order = currentOrder();
+  startMusic();
+  if (order.outputs.includes("stew_icon_0.png")) playSound("plate", 1);
+  else playSound("menu");
+  playSound("coin", 1, 1000);
   const matched = state.selected.filter(id => order.needs.includes(id)).length;
   const ratio = matched / order.needs.length;
   const hearts = ratio >= 0.999 ? 3 : ratio >= 0.66 ? 2 : ratio >= 0.33 ? 1 : 0;
@@ -162,6 +224,8 @@ function renderHearts(filled) {
 }
 
 function nextOrder() {
+  startMusic();
+  playSound("chair", 2);
   if (state.orderIndex === orders.length - 1) {
     state.orderIndex = 0;
     state.day += 1;
@@ -172,6 +236,8 @@ function nextOrder() {
 
 function clearSelection() {
   if (state.phase !== "choose") return;
+  startMusic();
+  playSound("menu");
   state.selected = [];
   renderIngredients();
   updateAction();
@@ -191,5 +257,21 @@ function hideResult() { $("order-result").hidden = true; }
 $("serve-button").addEventListener("click", handleMainAction);
 $("clear-button").addEventListener("click", clearSelection);
 $("again-button").addEventListener("click", nextOrder);
+$("audio-toggle").addEventListener("click", () => {
+  state.muted = !state.muted;
+  $("audio-toggle").setAttribute("aria-pressed", String(state.muted));
+  $("audio-toggle").setAttribute("aria-label", state.muted ? "Unmute music and sound" : "Mute music and sound");
+  $("audio-toggle").title = state.muted ? "Unmute music and sound" : "Mute music and sound";
+  if (state.muted) {
+    music.pause();
+    state.musicStarted = false;
+    activeEffects.forEach(sound => { sound.pause(); sound.currentTime = 0; });
+    activeEffects.clear();
+    playSound("menu");
+  } else {
+    startMusic();
+    playSound("menu");
+  }
+});
 $("coin-count").textContent = String(state.coins);
 renderOrder();

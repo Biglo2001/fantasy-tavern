@@ -1,6 +1,6 @@
 # The Lantern & Ladle prototype
 
-A touch-friendly landscape browser prototype for the fantasy tavern game. It uses the provided tavern background, customer portrait, and PNG ingredient icons in `assets/`.
+A touch-friendly landscape browser prototype for the fantasy tavern game. It uses the provided tavern background, customer portrait, PNG ingredient icons, music, and sound effects in `assets/`.
 
 ## Play
 
@@ -15,6 +15,8 @@ Open `index.html` in a modern browser. Turn a phone sideways to play; portrait o
 
 The prototype includes an alchemy-and-stew pairing, a mushroom stew, and a lemon tonic. Incorrect selections are allowed and affect the guest's reaction and coin reward.
 
+The tavern music begins after the first interaction to satisfy browser autoplay rules. Use the music-note button at the top to mute or unmute music and effects.
+
 ## Current scope
 
-This is a visual and gameplay prototype, not a production mobile game. Progress resets when the page reloads. The preparation animation and sound are placeholders; no music or sound effects are included.
+This is a visual and gameplay prototype, not a production mobile game. Progress resets when the page reloads. Preparation animations are placeholders, and the current supplied audio clips are prototypes for the final sound mix.
