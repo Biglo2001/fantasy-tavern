@@ -28,8 +28,16 @@ const orders = [
   }
 ];
 
+const customers = [
+  { name: "Elowen", description: "an elven regular", image: "customer_elven_woman_happy.png", alt: "A cheerful elven tavern guest" },
+  { name: "Pip", description: "a goblin tinkerer", image: "customer_goblin_happy.png", alt: "A cheerful goblin tavern guest" },
+  { name: "Rowan", description: "a human traveler", image: "customer_human_happy.png", alt: "A friendly human tavern guest" },
+  { name: "Brakka", description: "an orc adventurer", image: "customer_orc_sad.png", alt: "A smiling orc tavern guest" },
+  { name: "Mittens", description: "a curious catfolk", image: "customer_cat_happy.png", alt: "A cheerful catfolk tavern guest" }
+];
+
 const $ = (id) => document.getElementById(id);
-const state = { orderIndex: 0, selected: [], phase: "choose", coins: 23, day: 3, served: 0, timer: null, feedbackTimer: null, muted: false, musicStarted: false };
+const state = { orderIndex: 0, customer: null, selected: [], phase: "choose", coins: 23, day: 3, served: 0, timer: null, feedbackTimer: null, muted: false, musicStarted: false };
 const audioBase = new URL("assets/sounds/", document.baseURI);
 const music = new Audio(new URL("assets/music/Ale and Anecdotes.mp3", document.baseURI));
 music.loop = true;
@@ -80,14 +88,22 @@ function playSound(key, clipSeconds = null, delayMs = 0) {
 
 function currentOrder() { return orders[state.orderIndex]; }
 
+function chooseCustomer() {
+  const choices = customers.filter(customer => customer !== state.customer);
+  state.customer = choices[Math.floor(Math.random() * choices.length)];
+}
+
 function renderOrder() {
+  if (!state.customer) chooseCustomer();
   const order = currentOrder();
   state.selected = [];
   state.phase = "choose";
   $("customer").classList.remove("disappointed");
   $("game-stage").classList.remove("served", "is-preparing");
   $("order-caption").textContent = order.title;
-  $("guest-name").textContent = "Elowen · a regular";
+  $("customer").src = `assets/${state.customer.image}`;
+  $("customer").alt = state.customer.alt;
+  $("guest-name").textContent = `${state.customer.name} · ${state.customer.description}`;
   $("day-label").textContent = `Day ${state.day}`;
   $("clock-label").textContent = `12:${String(34 + state.served).padStart(2, "0")}`;
   $("order-items").innerHTML = order.outputs.map((icon, index) => `${index ? '<span class="order-plus">+</span>' : ""}<img src="${iconRoot + icon}" alt="${icon.includes("potion") ? "Red tonic" : "Hearth stew"}">`).join("");
@@ -156,7 +172,7 @@ function updateAction() {
     icon.textContent = "♨";
   } else if (state.phase === "ready") {
     button.disabled = false;
-    label.textContent = "Serve to Elowen";
+    label.textContent = `Serve to ${state.customer.name}`;
     icon.textContent = "♡";
   } else {
     button.disabled = true;
@@ -183,7 +199,7 @@ function prepareOrder() {
   state.timer = setTimeout(() => {
     state.phase = "ready";
     $("game-stage").classList.remove("is-preparing");
-    setFeedback("All ready. Elowen is waiting!");
+    setFeedback(`All ready. ${state.customer.name} is waiting!`);
     renderIngredients();
     updateAction();
   }, 1150);
@@ -212,7 +228,7 @@ function serveOrder() {
   $("result-copy").textContent = `${order[hearts === 3 ? "perfect" : hearts >= 2 ? "good" : "poor"]}  +${reward} coins`;
   $("again-button").innerHTML = state.orderIndex === orders.length - 1 ? `Serve tomorrow <span>→</span>` : `Next order <span>→</span>`;
   $("order-result").hidden = false;
-  setFeedback(hearts === 3 ? "Elowen absolutely loves it!" : "Elowen takes a thoughtful sip…");
+  setFeedback(hearts === 3 ? `${state.customer.name} absolutely loves it!` : `${state.customer.name} takes a thoughtful sip…`);
 }
 
 function renderHearts(filled) {
@@ -231,6 +247,7 @@ function nextOrder() {
     state.day += 1;
     state.served = 0;
   } else state.orderIndex += 1;
+  chooseCustomer();
   renderOrder();
 }
 

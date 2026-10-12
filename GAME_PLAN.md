@@ -147,4 +147,4 @@ Sources consulted: [CrazyGames game page](https://www.crazygames.com/game/barten
 
 ## Prototype status
 
-The browser prototype is implemented in `index.html`, `style.css`, and `game.js`. It uses the supplied landscape tavern background, customer portrait, ingredient icons, music, and sound effects. The loop covers ingredient selection, preparation, serving, a guest reaction, coin rewards, and three sample orders. See `README.md` for how to play it.
+The browser prototype is implemented in `index.html`, `style.css`, and `game.js`. It uses the supplied landscape tavern background, four randomly rotating customer portraits, ingredient icons, music, and sound effects. The loop covers ingredient selection, preparation, serving, a guest reaction, coin rewards, and three sample orders. See `README.md` for how to play it.
