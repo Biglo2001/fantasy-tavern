@@ -17,6 +17,24 @@ The prototype includes an alchemy-and-stew pairing, a mushroom stew, and a lemon
 
 The tavern music begins after the first interaction to satisfy browser autoplay rules. Use the music-note button at the top to mute or unmute music and effects.
 
+## Automated browser tests
+
+The GitHub Actions workflow runs the Playwright browser suite on every push and pull request. The suite checks for uncaught JavaScript exceptions, console errors, failed page or asset requests, missing artwork, phone-sized order-bubble layout issues, recipe preparation and serving, coin rewards, customer rotation, selection clearing, and the sound toggle. A failed test blocks deployment to GitHub Pages.
+
+To run the same checks locally, use Node.js 20 or later:
+
+```sh
+npm ci
+npx playwright install chromium
+npm test
+```
+
+To watch the tests run live in a browser window, use:
+
+```sh
+npx playwright test --headed
+```
+
 ## Current scope
 
 This is a visual and gameplay prototype, not a production mobile game. Progress resets when the page reloads. Preparation animations are placeholders, and the current supplied audio clips are prototypes for the final sound mix.
