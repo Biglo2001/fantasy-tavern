@@ -271,11 +271,30 @@ function setFeedback(message) {
 
 function hideResult() { $("order-result").hidden = true; }
 
+function syncFullscreenButton() {
+  const fullscreen = Boolean(document.fullscreenElement);
+  $("fullscreen-icon").src = `assets/icons/fullscreen_${fullscreen ? "minimize" : "expand"}_icon.png`;
+  $("fullscreen-toggle").setAttribute("aria-pressed", String(fullscreen));
+  $("fullscreen-toggle").setAttribute("aria-label", fullscreen ? "Exit fullscreen" : "Enter fullscreen");
+  $("fullscreen-toggle").title = fullscreen ? "Exit fullscreen" : "Enter fullscreen";
+}
+
+$("fullscreen-toggle").addEventListener("click", async () => {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else if (document.fullscreenEnabled) await $("game-screen").requestFullscreen();
+    else setFeedback("Fullscreen isn't available in this browser");
+  } catch {
+    setFeedback("Fullscreen isn't available here");
+  }
+});
+document.addEventListener("fullscreenchange", syncFullscreenButton);
 $("serve-button").addEventListener("click", handleMainAction);
 $("clear-button").addEventListener("click", clearSelection);
 $("again-button").addEventListener("click", nextOrder);
 $("audio-toggle").addEventListener("click", () => {
   state.muted = !state.muted;
+  $("audio-icon").src = `assets/icons/volume_${state.muted ? "off" : "on"}_icon.png`;
   $("audio-toggle").setAttribute("aria-pressed", String(state.muted));
   $("audio-toggle").setAttribute("aria-label", state.muted ? "Unmute music and sound" : "Mute music and sound");
   $("audio-toggle").title = state.muted ? "Unmute music and sound" : "Mute music and sound";
