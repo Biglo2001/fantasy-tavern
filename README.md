@@ -1,6 +1,6 @@
 # The Lantern & Ladle prototype
 
-A touch-friendly landscape browser prototype for the fantasy tavern game. It uses the provided tavern background, four randomly rotating customer portraits, PNG ingredient icons, music, and sound effects in `assets/`.
+A touch-friendly landscape browser prototype for the fantasy tavern game. It uses a swappable daytime tavern background with a separate counter foreground, four randomly rotating customer portraits, PNG ingredient icons, music, and sound effects in `assets/`.
 
 ## Play
 
