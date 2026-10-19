@@ -54,7 +54,7 @@ const phaseDurationSeconds = 60;
 const phaseFadeSeconds = 10;
 
 const $ = (id) => document.getElementById(id);
-const state = { level: "tavern", orderIndex: 0, customer: null, selected: [], phase: "choose", coins: 23, day: 1, served: 0, shiftPhase: "day", phaseSecondsRemaining: phaseDurationSeconds, phaseTimer: null, activeBackgroundLayer: 0, nightServedCount: 0, nightEnded: false, nightEndVisible: false, lastServiceSummary: "", timer: null, feedbackTimer: null, muted: false, musicStarted: false };
+const state = { level: "tavern", orderIndex: 0, customer: null, selected: [], phase: "choose", coins: 0, day: 1, served: 0, shiftPhase: "day", phaseSecondsRemaining: phaseDurationSeconds, phaseTimer: null, activeBackgroundLayer: 0, nightServedCount: 0, nightEnded: false, nightEndVisible: false, lastServiceSummary: "", timer: null, feedbackTimer: null, muted: false, musicStarted: false };
 const audioBase = new URL("assets/sounds/", document.baseURI);
 const music = new Audio(new URL("assets/music/Ale and Anecdotes.mp3", document.baseURI));
 music.loop = true;
