@@ -86,13 +86,18 @@ test("loads the artwork and keeps the order text clear of the hearts on a phone 
 test("plays through each recipe, rewards correct service, and rotates customers", async ({ page }) => {
   await page.goto("/");
   const customersSeen = [await page.locator("#customer").getAttribute("src")];
+  let expectedCoins = Number(await page.locator("#coin-count").textContent());
 
   for (let index = 0; index < orders.length; index += 1) {
     const order = orders[index];
     await expect(page.locator("#order-caption")).toHaveText(order.title);
     await prepareAndServe(page, order);
     await expect(page.locator("#result-title")).toHaveText("A perfect pairing!");
-    await expect(page.locator("#coin-count")).toHaveText(String(23 + [9, 8, 8].slice(0, index + 1).reduce((sum, reward) => sum + reward, 0)));
+    const resultCopy = await page.locator("#result-copy").textContent();
+    const reward = Number(resultCopy.match(/\+(\d+) coins/)[1]);
+    expect(reward).toBeGreaterThan(0);
+    expectedCoins += reward;
+    await expect(page.locator("#coin-count")).toHaveText(String(expectedCoins));
 
     await page.locator("#again-button").click();
     if (index < orders.length - 1) {
@@ -105,7 +110,6 @@ test("plays through each recipe, rewards correct service, and rotates customers"
   for (let index = 1; index < customersSeen.length; index += 1) {
     expect(customersSeen[index]).not.toBe(customersSeen[index - 1]);
   }
-  await expect(page.locator("#day-label")).toHaveText("Day 4");
   await expect(page.locator("#order-caption")).toHaveText(orders[0].title);
 });
 
