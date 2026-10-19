@@ -11,9 +11,13 @@ Open `index.html` in a modern browser. Turn a phone sideways to play; portrait o
 1. Select the requested ingredients from the tray.
 2. Prepare the order and watch the tavern's alchemy effects.
 3. Serve the current guest and see how many hearts the result earns. Guests are randomly selected for each new order without consecutive repeats.
-4. Continue through the three sample orders and start the next day.
+4. Keep serving as the tavern moves through its day. After night, serve the last guest and choose **Start next day**.
 
 The prototype includes an alchemy-and-stew pairing, a mushroom stew, and a lemon tonic. Incorrect selections are allowed and affect the guest's reaction and coin reward.
+
+## Day cycle
+
+The game starts on Day 1 during the day phase. Day, sunset, night, and dawn each last 90 seconds, with a 10-second background dissolve at each phase change. When night ends, the current guest can finish their order; after service, an interstitial offers **Start next day**. Starting the next day begins dawn and increments the day counter.
 
 The tavern music begins after the first interaction to satisfy browser autoplay rules. Use the music-note button at the top to mute or unmute music and effects.
 

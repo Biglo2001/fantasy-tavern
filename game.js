@@ -36,8 +36,25 @@ const customers = [
   { name: "Mittens", description: "a curious catfolk", image: "customer_cat_happy.png", alt: "A cheerful catfolk tavern guest" }
 ];
 
+const backgroundSets = {
+  tavern: {
+    dawn: "assets/backgrounds/dawn.jpeg",
+    day: "assets/backgrounds/day.png",
+    sunset: "assets/backgrounds/sunset.jpeg",
+    night: "assets/backgrounds/night.jpeg"
+  }
+};
+const phaseClockHours = {
+  dawn: [8, 8],
+  day: [8, 16],
+  sunset: [16, 19],
+  night: [19, 22]
+};
+const phaseDurationSeconds = 60;
+const phaseFadeSeconds = 10;
+
 const $ = (id) => document.getElementById(id);
-const state = { orderIndex: 0, customer: null, selected: [], phase: "choose", coins: 23, day: 1, served: 0, timer: null, feedbackTimer: null, muted: false, musicStarted: false };
+const state = { level: "tavern", orderIndex: 0, customer: null, selected: [], phase: "choose", coins: 23, day: 1, served: 0, shiftPhase: "day", phaseSecondsRemaining: phaseDurationSeconds, phaseTimer: null, activeBackgroundLayer: 0, nightServedCount: 0, nightEnded: false, nightEndVisible: false, lastServiceSummary: "", timer: null, feedbackTimer: null, muted: false, musicStarted: false };
 const audioBase = new URL("assets/sounds/", document.baseURI);
 const music = new Audio(new URL("assets/music/Ale and Anecdotes.mp3", document.baseURI));
 music.loop = true;
@@ -93,6 +110,79 @@ function chooseCustomer() {
   state.customer = choices[Math.floor(Math.random() * choices.length)];
 }
 
+function setPhaseBackground(phase, fade = true) {
+  const image = backgroundSets[state.level][phase];
+  const nextIndex = 1 - state.activeBackgroundLayer;
+  const currentScene = $(`scene-background-${state.activeBackgroundLayer === 0 ? "a" : "b"}`);
+  const nextScene = $(`scene-background-${nextIndex === 0 ? "a" : "b"}`);
+  const currentAmbient = $(`ambient-background-${state.activeBackgroundLayer === 0 ? "a" : "b"}`);
+  const nextAmbient = $(`ambient-background-${nextIndex === 0 ? "a" : "b"}`);
+  const imageValue = `url("${image}")`;
+  nextScene.style.backgroundImage = imageValue;
+  nextAmbient.style.backgroundImage = imageValue;
+
+  if (!fade) {
+    const layers = [currentScene, nextScene, currentAmbient, nextAmbient];
+    layers.forEach(layer => { layer.style.transition = "none"; });
+    nextScene.classList.add("is-visible");
+    nextAmbient.classList.add("is-visible");
+    currentScene.classList.remove("is-visible");
+    currentAmbient.classList.remove("is-visible");
+    // Commit the opacity change before restoring the normal dissolve style.
+    void nextScene.offsetWidth;
+    requestAnimationFrame(() => layers.forEach(layer => { layer.style.transition = ""; }));
+  } else {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      nextScene.classList.add("is-visible");
+      nextAmbient.classList.add("is-visible");
+      currentScene.classList.remove("is-visible");
+      currentAmbient.classList.remove("is-visible");
+    }));
+  }
+  state.activeBackgroundLayer = nextIndex;
+}
+
+function updatePhaseClock() {
+  $("day-label").textContent = `Day ${state.day}`;
+  const [startHour, endHour] = phaseClockHours[state.shiftPhase];
+  const elapsed = phaseDurationSeconds - state.phaseSecondsRemaining;
+  const hoursElapsed = state.nightEnded ? endHour - startHour :
+    Math.floor((elapsed / phaseDurationSeconds) * (endHour - startHour));
+  const hour24 = startHour + hoursElapsed;
+  const hour12 = hour24 % 12 || 12;
+  const meridiem = hour24 < 12 ? "AM" : "PM";
+  $("clock-label").textContent = `${hour12} ${meridiem}`;
+}
+
+function startShiftPhase(phase, { advanceDay = false, fade = true } = {}) {
+  clearInterval(state.phaseTimer);
+  if (advanceDay) state.day += 1;
+  state.shiftPhase = phase;
+  if (phase === "night") state.nightServedCount = 0;
+  state.phaseSecondsRemaining = phaseDurationSeconds;
+  state.nightEnded = false;
+  setPhaseBackground(phase, fade);
+  updatePhaseClock();
+  state.phaseTimer = setInterval(() => {
+    state.phaseSecondsRemaining = Math.max(0, state.phaseSecondsRemaining - 1);
+    updatePhaseClock();
+    if (state.phaseSecondsRemaining === 0) finishShiftPhase();
+  }, 1000);
+}
+
+function finishShiftPhase() {
+  clearInterval(state.phaseTimer);
+  state.phaseTimer = null;
+  if (state.shiftPhase === "night") {
+    state.nightEnded = true;
+    updatePhaseClock();
+    if (state.phase === "served" && state.nightServedCount > 0) showNightEndScreen();
+    return;
+  }
+  const nextPhase = { dawn: "day", day: "sunset", sunset: "night" }[state.shiftPhase];
+  startShiftPhase(nextPhase);
+}
+
 function renderOrder() {
   if (!state.customer) chooseCustomer();
   const order = currentOrder();
@@ -104,8 +194,7 @@ function renderOrder() {
   $("customer").src = `assets/${state.customer.image}`;
   $("customer").alt = state.customer.alt;
   $("guest-name").textContent = `${state.customer.name} · ${state.customer.description}`;
-  $("day-label").textContent = `Day ${state.day}`;
-  $("clock-label").textContent = `12:${String(34 + state.served).padStart(2, "0")}`;
+  updatePhaseClock();
   $("order-items").innerHTML = order.outputs.map((icon, index) => `${index ? '<span class="order-plus">+</span>' : ""}<img src="${iconRoot + icon}" alt="${icon.includes("potion") ? "Red tonic" : "Hearth stew"}">`).join("");
   renderHearts(2);
   renderRecipeNote(order);
@@ -217,6 +306,7 @@ function serveOrder() {
   const reward = Math.max(1, 2 + matched + hearts);
   state.coins += reward;
   state.served += 1;
+  if (state.shiftPhase === "night") state.nightServedCount += 1;
   state.phase = "served";
   $("coin-count").textContent = String(state.coins);
   $("game-stage").classList.add("served");
@@ -226,9 +316,23 @@ function serveOrder() {
   updateAction();
   $("result-title").textContent = hearts === 3 ? "A perfect pairing!" : hearts >= 2 ? "A happy little moment." : "A recipe to learn from.";
   $("result-copy").textContent = `${order[hearts === 3 ? "perfect" : hearts >= 2 ? "good" : "poor"]}  +${reward} coins`;
-  $("again-button").innerHTML = state.orderIndex === orders.length - 1 ? `Serve tomorrow <span>→</span>` : `Next order <span>→</span>`;
+  state.lastServiceSummary = `${state.customer.name} was served. ${order[hearts === 3 ? "perfect" : hearts >= 2 ? "good" : "poor"]} +${reward} coins.`;
+  $("again-button").innerHTML = `Next order <span>→</span>`;
+  if (state.nightEnded) {
+    showNightEndScreen();
+    return;
+  }
   $("order-result").hidden = false;
   setFeedback(hearts === 3 ? `${state.customer.name} absolutely loves it!` : `${state.customer.name} takes a thoughtful sip…`);
+}
+
+function showNightEndScreen() {
+  if (state.nightEndVisible) return;
+  state.nightEndVisible = true;
+  $("customer").hidden = true;
+  $("order-result").hidden = true;
+  $("night-end-copy").textContent = state.lastServiceSummary || "The last guest has been served. A new day awaits.";
+  $("night-end-screen").hidden = false;
 }
 
 function renderHearts(filled) {
@@ -240,14 +344,29 @@ function renderHearts(filled) {
 }
 
 function nextOrder() {
+  if (state.nightEnded && state.nightServedCount > 0) {
+    showNightEndScreen();
+    return;
+  }
   startMusic();
   playSound("chair", 2);
-  if (state.orderIndex === orders.length - 1) {
-    state.orderIndex = 0;
-    state.day += 1;
-    state.served = 0;
-  } else state.orderIndex += 1;
+  state.orderIndex = (state.orderIndex + 1) % orders.length;
   chooseCustomer();
+  renderOrder();
+}
+
+function startNextDay() {
+  if (!state.nightEndVisible) return;
+  startMusic();
+  playSound("chair", 2);
+  $("night-end-screen").hidden = true;
+  state.nightEndVisible = false;
+  state.served = 0;
+  state.orderIndex = (state.orderIndex + 1) % orders.length;
+  chooseCustomer();
+  $("customer").hidden = false;
+  state.nightServedCount = 0;
+  startShiftPhase("dawn", { advanceDay: true, fade: false });
   renderOrder();
 }
 
@@ -292,6 +411,7 @@ document.addEventListener("fullscreenchange", syncFullscreenButton);
 $("serve-button").addEventListener("click", handleMainAction);
 $("clear-button").addEventListener("click", clearSelection);
 $("again-button").addEventListener("click", nextOrder);
+$("start-next-day").addEventListener("click", startNextDay);
 $("audio-toggle").addEventListener("click", () => {
   state.muted = !state.muted;
   $("audio-icon").src = `assets/icons/volume_${state.muted ? "off" : "on"}_icon.png`;
@@ -310,4 +430,10 @@ $("audio-toggle").addEventListener("click", () => {
   }
 });
 $("coin-count").textContent = String(state.coins);
+document.documentElement.style.setProperty("--phase-fade-seconds", `${phaseFadeSeconds}s`);
+Object.values(backgroundSets[state.level]).forEach(source => {
+  const preload = new Image();
+  preload.src = source;
+});
+startShiftPhase("day", { fade: false });
 renderOrder();
